@@ -38,21 +38,21 @@ const cart = [
 ];
 
 
-const discountCode = "SAVE10";  // This means 10% off
+const discountCode = "FLAT50";  // This means 10% off
 
-function discountFunc(dis) {
+function discountFunc(subtotal, dis) {
     const code = dis.toUpperCase(); 
-    if (code === "SAVE10") return (0.1);
-    if (code === "SAVE20") return (0.2);
-    if (code === "FLAT50") return (0.5);
+    if (code === "SAVE10") return (subtotal * 0.1);
+    if (code === "SAVE20") return (subtotal * 0.2);
+    if (code === "FLAT50") return Math.min(subtotal, 50);
 
-    return 0
+    return 0;
 }
 
 
 function processCart(arr, dis) {
     
-    const cupon = discountFunc(dis)
+    // const cupon = discountFunc(dis)
     // console.log(cupon)
 
     const totalQun = arr.reduce((num, product) => num + product.quantity, 0);
@@ -61,14 +61,15 @@ function processCart(arr, dis) {
     const subtotal = arr.reduce((num, product) => num + (product.price * product.quantity), 0);
     // console.log(subtotal)
 
-    const discount = subtotal * cupon;
+    const discount = discountFunc(subtotal , dis);
+    // const discount = subtotal * cupon;
     // console.log(discount)
 
     const finalTotal = subtotal - discount;
     // console.log(finalTotal)
 
     const summary = arr.map((elem) => {
-        return (`${elem.name} x ${elem.quantity} = $${elem.price * elem.quantity}` )
+        return (`${elem.name} x ${elem.quantity} = $${elem.price * elem.quantity}` );
         
     })
     // console.log(summary)
@@ -81,6 +82,6 @@ function processCart(arr, dis) {
             summary: summary
         }
 }
-console.log(product(cart , discountCode))
+console.log(processCart(cart , discountCode))
 
 
