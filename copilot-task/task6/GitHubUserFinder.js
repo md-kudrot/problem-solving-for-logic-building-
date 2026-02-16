@@ -38,8 +38,7 @@ JavaScript
 
 // Part 1: Fetch real user data from GitHub API
 async function fetchGitHubUser(username) {
-    // 1. Use fetch() to get data from:
-    //    https://api.github.com/users/{username}
+        
     try {
         const response = await fetch(`https://api.github.com/users/${username}`)
         // console.log(data.ok) // true
@@ -52,66 +51,51 @@ async function fetchGitHubUser(username) {
         return data;
 
     } catch (error) {
-        console.log("Error:", error.message)
+        throw error;
     }
-    // 2. Check if response.ok
-    // 3. If not ok, throw error
-    // 4. Convert to JSON and return
 }
 
-// fetchGitHubUser("md-kudrot")
+
 
 // Part 2: Get account type based on followers
 function getAccountType(followers) {
-    // console.log(followers)
-
     if (followers >= 100000) return "👑 Legendary (100k+ followers)"
     if (followers >= 10000) return "⭐ Famous (10k+ followers)"
     if (followers >= 1000) return "🌟 Popular (1k+ followers)"
     if (followers >= 100) return "📈 Growing (100+ followers)"
     if (followers >= 0) return "🌱 Starter"
-    // Return account type based on follower count
-    // Use the table above!
 }
 
 // Part 3: Format the raw API data
-function formatUserProfile(userData, type) {
-    // console.log(userData)
-    const dataObj = userData;
+function formatUserProfile(userData) {
     return {
-        username: dataObj.login,
-        name: dataObj.name,
-        avatar: dataObj.avatar_url,
-        bio: dataObj.bio,
-        publicRepos: dataObj.public_repos,
-        followers: dataObj.followers,
-        following: dataObj.following,
-        profileUrl: dataObj.html_url,
-        accountType: type
+        username: userData.login,
+        name: userData.name || "No name provided",
+        avatar: userData.avatar_url,
+        bio: userData.bio || "No bio provided",
+        profileUrl: userData.html_url,
+        publicRepos: userData.public_repos,
+        followers: userData.followers,
+        following: userData.following,
+        accountType: getAccountType(userData.followers)
+        
     }
-    // Return clean object with:
-    // username, name, avatar, bio, publicRepos,
-    // followers, following, profileUrl, accountType
 }
 
 // Part 4: Main function
 async function getGitHubProfile(username) {
     try {
         // 1. Fetch user data
-        const reciveData = await fetchGitHubUser(`${username}`)
-        // console.log(reciveData)
-        // 2. Format the profile
-        const accountType = getAccountType(reciveData.followers)
-        const formatedData = formatUserProfile(reciveData, accountType)
-        // console.log(formatedData)
+        const userData = await fetchGitHubUser(username)
 
-        // console.log(accountType)
-        // 3. Return success object
+        // const accountType = getAccountType(userData.followers)
+        const formatedData = formatUserProfile(userData)
+
 
         return {
             success: true,
             profile: formatedData,
-            message: `Profile for ${reciveData.name} fetched successfully`
+            message: `Profile for ${userData.name} fetched successfully`
         }
     } catch (error) {
         return {
@@ -121,12 +105,12 @@ async function getGitHubProfile(username) {
         }
     }
 }
+getGitHubProfile("md-kudrot").then(result => console.log(result));
 
 // Test with real GitHub users!
 // getGitHubProfile("md-kudrot")
 // getGitHubProfile("torvalds")
 // getGitHubProfile("xcfio")
 // getGitHubProfile("67ij")
-// getGitHubProfile("md-kudrot").then(result => console.log(result));  // Your profile!
 // getGitHubProfile("torvalds").then(result => console.log(result));  // Your profile!
-getGitHubProfile("fakeuser12345xyz").then(result => console.log(result));
+// getGitHubProfile("fakeuser12345xyz").then(result => console.log(result));
